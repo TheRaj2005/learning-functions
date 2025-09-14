@@ -1,0 +1,158 @@
+ConversionType = input("Would you like to convert between Temperature, Distance, or Mass (in uppercase)")
+
+def find_row(unit,table):
+    for row in table:
+        if unit in row[0:2]:
+            return row
+    return None
+
+def temperature_conversion(temp_type_input, temp_type_output, temp_value):
+    if temp_type_input in ("Fahrenheit", "F"):
+        if temp_type_output in ("Celsius", "C"):
+            result = (temp_value - 32) * 5/9
+        elif temp_type_output in ("Kelvin", "K"):
+            result = (temp_value - 32) * 5/9 + 273.15
+
+    elif temp_type_input in ("Celsius", "C"):
+        if temp_type_output in ("Fahrenheit", "F"):
+            result = (temp_value * 9/5) + 32
+        elif temp_type_output in ("Kelvin", "K"):
+            result = temp_value + 273.15
+
+    elif temp_type_input in ("Kelvin", "K"):
+        if temp_type_output in ("Fahrenheit", "F"):
+            result = (temp_value - 273.15) * 9/5 + 32
+        elif temp_type_output in ("Celsius", "C"):
+            result = temp_value - 273.15
+
+    return result
+
+metric_distances = [
+    ["millimeter", "mm", 0.001],
+    ["centimeter", "cm", 0.01],
+    ["decimeter", "dm", 0.1],
+    ["meter", "m", 1],
+    ["decameter", "dm", 10],
+    ["hectometer", "hm", 100],
+    ["kilometer", "km", 1000],
+]
+
+meterToInch = 39.37007874
+
+imperial_distances = [
+    ["inch", "in", 1],
+    ["foot", "ft", 12],
+    ["yard", "yd", 36],
+    ["mile", "mi", 63360]
+]
+
+metric_distances_list = ["millimeter", "mm", "centimeter", "cm", "decimeter", "dm", "meter", "m", "decameter", "dm",
+"hectometer", "hm", "kilometer", "km"]
+
+imperial_distances_list = ["inch", "in", "foot", "ft", "yard", "yd", "mile", "mi"]
+
+def distanceConversion(distanceTypeInput, distanceTypeOutput, distanceValue):
+    if distanceTypeInput in imperial_distances_list and distanceTypeOutput in imperial_distances_list:
+        row1 = find_row(distanceTypeInput, imperial_distances)
+        row2 = find_row(distanceTypeOutput, imperial_distances)
+
+        factor1 = row1[2]; factor2 = row2[2]; result = (factor1 / factor2) * distanceValue; return result
+
+    elif distanceTypeInput in imperial_distances_list and distanceTypeOutput in metric_distances_list:
+        row1 = find_row(distanceTypeInput, imperial_distances)
+        row2 = find_row(distanceTypeOutput, metric_distances)
+
+        inches = distanceValue * row1[2]
+        meters = inches / meterToInch
+        return meters / row2[2]
+
+    elif distanceTypeInput in metric_distances_list and distanceTypeOutput in imperial_distances_list:
+        row1 = find_row(distanceTypeInput, metric_distances)
+        row2 = find_row(distanceTypeOutput, imperial_distances)
+
+        meters = distanceValue * row1[2]
+        inches = meters * meterToInch
+        return inches / row2[2]
+
+    elif distanceTypeInput in metric_distances_list and distanceTypeOutput in metric_distances_list:
+        row1 = find_row(distanceTypeInput, metric_distances)
+        row2 = find_row(distanceTypeOutput, metric_distances)
+
+        factor1 = row1[2]; factor2 = row2[2]; result = (factor1 / factor2) * distanceValue; return result
+
+metric_masses = [
+    ["milligram", "mg", 0.001],
+    ["centigram", "cg", 0.01],
+    ["decigram", "dg", 0.1],
+    ["gram", "g", 1],
+    ["dekagram", "dag", 10],
+    ["hectogram", "hg", 100],
+    ["kilogram", "kg", 1000],
+    ["tonne", "t", 1000000]
+]
+
+gramToOunce = 28.3495
+
+imperial_masses = [
+    ["ounce", "oz", 1],
+    ["pound", "lb", 16],
+    ["ton", "tn", 32000]
+]
+
+metric_masses_list = ["milligram", "mg", "centigram", "cg", "decigram", "dg", "gram", "g", "dekagram", "dg",
+    "hectogram", "hg", "kilogram", "kg", "tonne", "t"]
+
+imperial_masses_list = ["ounce", "oz", "pound", "lb", "ton", "tn"]
+
+
+def massConversion(massTypeInput, massTypeOutput, massValue):
+    if massTypeInput in imperial_masses_list and massTypeOutput in imperial_masses_list:
+        row1 = find_row(massTypeInput, imperial_masses)
+        row2 = find_row(massTypeOutput, imperial_masses)
+
+        factor1 = row1[2]; factor2 = row2[2]; result = (factor1 / factor2) * massValue; return result
+
+    elif massTypeInput in imperial_masses_list and massTypeOutput in metric_masses_list:
+        row1 = find_row(massTypeInput, imperial_masses)
+        row2 = find_row(massTypeOutput, metric_masses)
+        ounces = massValue * row1[2]
+        grams = ounces * gramToOunce
+        return grams / row2[2]
+
+    elif massTypeInput in metric_masses_list and massTypeOutput in imperial_masses_list:
+        row1 = find_row(massTypeInput, metric_masses)
+        row2 = find_row(massTypeOutput, imperial_masses)
+        grams = massValue * row1[2]
+        ounces = grams / gramToOunce
+        return ounces / row2[2]
+
+    elif massTypeInput in metric_masses_list and massTypeOutput in metric_masses_list:
+        row1 = find_row(massTypeInput, metric_distances)
+        row2 = find_row(massTypeOutput, metric_distances)
+
+        factor1 = row1[2]; factor2 = row2[2]; result = (factor1 / factor2) * massValue; return result
+
+def main():
+    if ConversionType == "Temperature":
+        tempTypeInput = input("Enter the Temperature input type in lowercase")
+        tempTypeOutput = input("Enter the Temperature output type in lowercase")
+        tempValue = float(input("Enter the Temperature value "))
+        print(str(tempValue) + " " + tempTypeInput + " = " + str(
+            temperature_conversion(tempTypeInput, tempTypeOutput, tempValue)) + " " + tempTypeOutput)
+
+    elif ConversionType == "Distance":
+        distanceTypeInput = input("Enter the Distance input type in lowercase")
+        distanceTypeOutput = input("Enter the Distance output type in lowercase")
+        distanceValue = float(input("Enter the Distance value "))
+        print(str(distanceValue) + " " + distanceTypeInput + " = " + str(
+            distanceConversion(distanceTypeInput, distanceTypeOutput, distanceValue)) + " " + distanceTypeOutput)
+
+    elif ConversionType == "Mass":
+        massTypeInput = input("Enter the Mass input type in lowercase")
+        massTypeOutput = input("Enter the Mass output type in lowercase")
+        massValue = float(input("Enter the Mass value "))
+        print(str(massValue) + " " + massTypeInput + " = " + str(
+            massConversion(massTypeInput, massTypeOutput, massValue)) + " " + massTypeOutput)
+
+if __name__ == "__main__":
+    main()
