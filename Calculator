@@ -1,0 +1,178 @@
+def find_plus_or_minus(s):
+
+    for i in range(len(s)):
+        if s[i] == "+" or s[i] == "-":
+            if i > 0 and (s[i-1].isdigit() or s[i-1] == ")"):
+                return i
+    return -1
+
+
+def Grab_Number(s, start_index):
+    """
+    Reads a number (with optional + or - in front)
+    starting at start_index in the string s.
+
+    Returns: (number, next_index)
+    """
+    sign = 1  # assume positive
+    i = start_index
+
+    # If it starts with + or -, record the sign
+    if i < len(s) and s[i] == "-":
+        sign = -1
+        i += 1
+    elif i < len(s) and s[i] == "+":
+        i += 1
+
+    # Collect digits and maybe a decimal point
+    j = i
+    while j < len(s) and (s[j].isdigit() or s[j] == "."):
+        j += 1
+
+    # Convert the substring to a number
+    number = To_Number(s[i:j]) * sign
+
+    return number, j
+
+def Grab_Number_Left(s: str, end_index: int):
+    """
+    Reads a number ending at end_index (inclusive), allowing a leading + or -.
+    Returns (number_value, start_index_of_that_number).
+    """
+    i = end_index
+    # step left over digits/decimal point
+    while i >= 0 and (s[i].isdigit() or s[i] == '.'):
+        i -= 1
+
+    # i is now just before the digits. If there is a sign and it’s unary, include it.
+    start = i + 1
+    if i >= 0 and s[i] in '+-':
+        # It’s unary if at the very start, or if the char before is an operator or '('
+        if i == 0 or s[i-1] in '+-*/^(':
+            start = i  # include the sign
+
+    num = To_Number(s[start:end_index+1])
+    return num, start
+
+
+def Do_Parentheses(equation):
+    while "(" in equation:
+        start = equation.rfind("(")
+        end = equation.find(")", start)
+        inside = equation[start+1:end]
+        value = str(Evaluate(inside))
+        equation = equation[:start] + value + equation[end+1:]
+    return equation
+
+def To_Number(s: str):
+    if s.isdigit():
+        return int(s)
+    else:
+        return float(s)
+
+
+def Do_Exponents(equation):
+    while "^" in equation:
+        carrot = equation.rfind("^")
+
+        i = carrot - 1 # Carrot index - 1
+        while i >= 0 and (equation[i].isdigit() or equation[i] == "."): # while that index is a digit or decimal
+            i -= 1 # move down an index
+        left = To_Number(equation[i+1:carrot]) # compensate for the extra while loop
+
+        right, j = Grab_Number(equation, carrot + 1)
+
+        result = str(left ** right)
+        equation = equation[:i + 1] + result + equation[j:]
+    return equation
+
+def Do_MultiplicationAndDivision(equation):
+    while "*" in equation or "/" in equation:
+        mul_index = equation.find("*")
+        div_index = equation.find("/")
+
+        if mul_index == -1:
+            operator = div_index
+        elif div_index == -1:
+            operator = mul_index
+        else:
+            operator = min(mul_index, div_index)
+
+        i = operator - 1
+        while i >= 0 and (equation[i].isdigit() or equation[i] == "."):
+            i -= 1
+
+        left_start = i + 1
+        if i >=0 and equation in "+-":
+            if i == 0 or equation[i-1] in "+-*/^(":
+                left_start = i
+        left = To_Number(equation[left_start:operator])
+
+        # RIGHT side
+        right, j = Grab_Number(equation, operator + 1)
+
+        if operator == div_index:
+            result = str(left/right)
+        elif operator == mul_index:
+            result = str(left*right)
+
+        equation = equation[:i+1] + result + equation[j:]
+    return equation
+
+def Do_AdditionAndSubtraction(equation):
+    while True:
+
+        operator = find_plus_or_minus(equation)
+        if operator == -1:
+            return equation
+
+        i = operator - 1
+
+        while i >= 0 and (equation[i].isdigit() or equation[i] == "."):
+            i -= 1
+        left_start = i + 1
+        if i >= 0 and equation[i] in "+-":
+            if i == 0 or equation[i-1] in "+-*/^(":
+                left_start = i
+        left = To_Number(equation[left_start:operator])
+
+        right, j = Grab_Number(equation, operator + 1)
+
+        if equation[operator] == "+":
+            result = str(left + right)
+        else:
+            result = str(left - right)
+
+        equation = equation[:left_start] + result + equation[j:]
+
+    return equation
+
+
+def Evaluate(equation):
+    equation = Do_Parentheses(equation)
+    equation = Do_Exponents(equation)
+    equation = Do_MultiplicationAndDivision(equation)
+    equation = Do_AdditionAndSubtraction(equation)
+
+    return float(equation)
+
+def smart_round(value: float) -> str:
+    s = str(value)
+
+    if "." not in s:
+        return s
+
+    integer, decimal = s.split(".")
+
+
+    for i in range(len(decimal) - 5):
+        if len(set(decimal[i:i+6])) == 1:
+
+            rounded = round(value, i)
+            return str(rounded)
+
+    return s
+
+
+equation = input("Enter your equation: ").replace(" ", "")
+print(smart_round(Evaluate(equation)))
