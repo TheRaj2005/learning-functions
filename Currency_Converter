@@ -1,0 +1,55 @@
+def find_row(unit,table):
+    for row in table:
+        if unit in row[0:2]:
+            return row
+    return None
+
+CurrencyRates = [
+    ["USD", "US Dollar", 1],
+    ["EUR", "Euro", 0.85],
+    ["JPY", "Japanese Yen", 147.9],
+    ["GBP", "UK Pound", 0.74],
+    ["CAD", "Canada Dollar", 1.38],
+    ["AUD", "Australian Dollar", 1.52],
+    ["CHF", "Swiss Franc", 0.8],
+    ["CNY", "Chinese Yuan", 7.11],
+    ["HKD", "Hong Kong Dollar", 7.78],
+    ["NZD", "New Zealand Dollar", 1.76],
+    ["SEK", "Swedish Krona", 9.41],
+    ["NOK", "Norwegian Krona", 9.94],
+    ["DKK", "Danish Krone", 6.35],
+    ["SGD", "Singapore Dollar", 1.28],
+    ["INR", "Indian Rupee", 88.09],
+    ["KRW", "South Korean Won", 1396.76],
+    ["MXN", "Mexican Peso", 18.4],
+    ["BRL", "Brazilian Real", 5.33],
+    ["ZAR", "South African Rand", 17.34]
+]
+
+def convertcurrencies(CurrInput, CurrValue, CurrOutput):
+
+    row1 = find_row(CurrInput, CurrencyRates)
+    row2 = find_row(CurrOutput, CurrencyRates)
+    factor1 = float(row1[2]); factor2 = float(row2[2]);
+
+    amount = CurrValue * (factor2 / factor1)
+    return amount
+
+valid_codes = {row[0] for row in CurrencyRates} | {row[1] for row in CurrencyRates}
+
+def main():
+    CurrInput = input("Enter the currency you want to convert from:" + "\n" +
+    "Please enter currency as an official currency code 'USD' or formal name 'US Dollar':")
+    while CurrInput not in valid_codes:
+        print("Please enter a valid currency.")
+        CurrInput = input("Enter the currency you want to convert from: ")
+    CurrValue = float(input("Enter the amount of currency in " + CurrInput + ":"))
+    CurrOutput = input("Enter the currency you want to convert to:")
+    while CurrOutput not in valid_codes:
+        print("Please enter a valid currency.")
+        CurrOutput = input("Enter the currency you want to convert to:")
+    print(str(CurrValue) + " " + CurrInput + " = " + str(round(convertcurrencies(CurrInput, CurrValue, CurrOutput),3))
+          + " " + CurrOutput)
+
+if __name__ == "__main__":
+    main()
