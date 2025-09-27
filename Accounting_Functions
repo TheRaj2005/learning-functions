@@ -1,0 +1,289 @@
+def StraightLineDepreciation(inputs):
+    AssetCost = inputs.get("AssetCost")
+    SalvageValue = inputs.get("SalvageValue")
+    UsefulLife = inputs.get("UsefulLife")
+    if None in [AssetCost, SalvageValue, UsefulLife]:
+        return None
+    StraightLineDepriciationExpense = ((AssetCost - SalvageValue)/UsefulLife)
+    return StraightLineDepriciationExpense
+
+def DoubleDecliningBalanceDepreciation(inputs):
+    AssetCost = inputs.get("AssetCost")
+    SalvageValue = inputs.get("SalvageValue")
+    AccumulatedDepreciation = inputs.get("AccumulatedDepreciation")
+    UsefulLife = inputs.get("UsefulLife")
+    if None in [AssetCost, SalvageValue, AccumulatedDepreciation, UsefulLife]:
+        return None
+    Book_Value_Begin = AssetCost - AccumulatedDepreciation
+    Double_Declining_Balance = (2 / UsefulLife) * Book_Value_Begin
+    return Double_Declining_Balance
+
+def UnitOfProductionDepreciation(inputs):
+    AssetCost = inputs.get("AssetCost")
+    SalvageValue = inputs.get("SalvageValue")
+    TotalEstimatedProduction = inputs.get("TotalEstimatedProduction")
+    ActualProduction = inputs.get("ActualProduction")
+    if None in [AssetCost, SalvageValue, TotalEstimatedProduction, ActualProduction]:
+        return None
+    UnitsOfProductionDepreciationExpense = ((AssetCost - SalvageValue) / TotalEstimatedProduction) * ActualProduction
+    return UnitsOfProductionDepreciationExpense
+
+def FIFOCOGS(inputs):
+    PurchaseQuantity1 = inputs.get("PurchaseQuantity1")
+    PurchaseQuantity2 = inputs.get("PurchaseQuantity2")
+    UnitCost1 = inputs.get("UnitCost1")
+    UnitCost2 = inputs.get("UnitCost2")
+    UnitsSold = inputs.get("UnitsSold")
+    if None in [PurchaseQuantity1, UnitCost1, PurchaseQuantity2, UnitCost2, UnitsSold]:
+        return None
+    if UnitsSold <= PurchaseQuantity1:
+        return UnitsSold * UnitCost1
+    else:
+        remaining = UnitsSold - PurchaseQuantity1
+        return (PurchaseQuantity1 * UnitCost1) + (remaining * UnitCost2)
+
+def LIFOCOGS(inputs):
+    PurchaseQuantity1 = inputs.get("PurchaseQuantity1")
+    PurchaseQuantity2 = inputs.get("PurchaseQuantity2")
+    UnitCost1 = inputs.get("UnitCost1")
+    UnitCost2 = inputs.get("UnitCost2")
+    UnitsSold = inputs.get("UnitsSold")
+    if None in [PurchaseQuantity1, UnitCost1, PurchaseQuantity2, UnitCost2, UnitsSold]:
+        return None
+    if UnitsSold <= PurchaseQuantity2:
+        return UnitsSold * UnitCost2
+    else:
+        remaining = UnitsSold - PurchaseQuantity2
+        return (PurchaseQuantity2 * UnitCost2) + (remaining * UnitCost1)
+
+def WeightedAverageCOGS(inputs):
+    PurchaseQuantity1 = inputs.get("PurchaseQuantity1")
+    PurchaseQuantity2 = inputs.get("PurchaseQuantity2")
+    UnitCost1 = inputs.get("UnitCost1")
+    UnitCost2 = inputs.get("UnitCost2")
+    UnitsSold = inputs.get("UnitsSold")
+    if None in [PurchaseQuantity1, UnitCost1, PurchaseQuantity2, UnitCost2, UnitsSold]:
+        return None
+    total_cost = (PurchaseQuantity1 * UnitCost1) + (PurchaseQuantity2 * UnitCost2)
+    total_units = PurchaseQuantity1 + PurchaseQuantity2
+    avg_cost = total_cost / total_units
+    return UnitsSold * avg_cost
+
+def AccrualInterest(inputs):
+    PrincipalAmount = inputs.get("PrincipalAmount")
+    InterestRate = inputs.get("InterestRate")
+    Time = inputs.get("Time")
+    if None in [PrincipalAmount, InterestRate, Time]:
+        return None
+    return PrincipalAmount * InterestRate * Time
+
+def AllowanceForDoubtfulAccounts(inputs):
+    AccountsReceivable = inputs.get("AccountsReceivable")
+    DefaultRateOfUncollectibility = inputs.get("DefaultRateOfUncollectibility")
+    if None in [AccountsReceivable, DefaultRateOfUncollectibility]:
+        return None
+    return DefaultRateOfUncollectibility * AccountsReceivable
+
+def EffectiveInterestAmortization(inputs):
+    InitialCarryingAmount = inputs.get("InitialCarryingAmount")
+    CouponRate = inputs.get("CouponRate")
+    FaceValue = inputs.get("FaceValue")
+    EffectiveInterestRate = inputs.get("EffectiveInterestRate")
+    if None in [InitialCarryingAmount, CouponRate, FaceValue, EffectiveInterestRate]:
+        return None
+
+    cash_paid = FaceValue * CouponRate
+    interest_expense = InitialCarryingAmount * EffectiveInterestRate
+    amortization = interest_expense - cash_paid
+    new_carrying = InitialCarryingAmount + amortization
+
+    return {
+        "cash_paid": cash_paid,
+        "interest_expense": interest_expense,
+        "amortization": amortization,
+        "new_carrying": new_carrying
+    }
+
+MANUAL_MENU_TEXT = """
+        The following functions are the actions that this program can perform + \n
+        Please enter the number of the function that you want performed + \n
+        1. Straight Line Depreciation + \n
+        2. Double Declining Balance Depreciation + \n
+        3. Units of Production Depreciation + \n
+        4. FIFO COGS (First-in, First-out) + \n
+        5. LIFO COGS (Last-in, First-out) + \n
+        6. Weighted Average Cost COGS + \n
+        7. Accrual Intrest + \n
+        8. Allowance for Doubtful Accounts + \n
+        9. Effective Interest Amortization + \n
+        10. Depreciation Summary Information + \n
+        11. COGS summary + \n
+        
+    """
+
+FROM_FILE_MENU_TEXT = """
+        Please enter the name of the .txt file you want to read from. + \n
+        You will need to enter in the exact file name with the file extension + \n
+        For example: file.txt + \n
+        For this program to correctly read the contents of the file,  + \n
+        the file will need to have the Input and Value on the same row. + \n
+        For example: 
+        Asset cost: 20 + \n
+        Salvage value: 12 + \n
+        
+"""
+
+ACCEPTABLE_INPUT_NAMES = """
+
+        Please check spelling.
+        Please note that not all fields are expected to be filled in.
+        The program will run what it can calculate based on the inputs given.
+        
+        Depreciation Inputs : + \n
+        
+        Asset Cost + \n
+        Salvage Value + \n
+        Useful Life + \n
+        Accumulated Depreciation + \n
+        Total Estimated Production + \n
+        Actual Production + \n
+        
+        Cost of Goods Sold Inputs: + \n
+        
+        Units Sold + \n
+        Unit Cost1 + \n
+        Unit Cost2 + \n
+        Purchase Quantity1 + \n
+        Purchase Quantity2 + \n
+        
+        Accrual Interest Inputs: + \n
+        
+        Principal Amount + \n
+        Interest Rate + \n
+        Time 'in years' + \n
+        ------- Please note that the term will be Time, not 'Time in years' -------
+        
+        Allowance For Doubtful Accounts: + \n
+        
+        Accounts Receivable + \n
+        Default Rate Of Uncollectibility + \n
+        
+        Effective Interest Amortization: + \n
+        
+        Initial Carrying Amount + \n
+        Effective Interest Rate + \n
+        Coupon Rate + \n
+        Face Value: + \n
+    
+"""
+
+TERMS_LIST = [
+    "Asset Cost", "Salvage Value", "Useful Life", "Accumulated Depreciation", "Total Estimated Production",
+    "Actual Production", "Units Sold", "Unit Cost1", "Unit Cost2", "Purchase Quantity1", "Purchase Quantity2",
+    "Principal Amount", "Interest Rate", "Time", "Accounts Receivable", "Default Rate Of Uncollectibility",
+    "Initial Carrying Amount", "Effective Interest Rate", "Coupon Rate", "Face Value"
+]
+def Main():
+
+    FunctionToPerform = input("Would you like to read lines from a file or enter text manually?" + "\n" +
+    "You can enter 'FromFile' or 'Manually'")
+
+    if FunctionToPerform == "Manually":
+        print(MANUAL_MENU_TEXT)
+        FunctionNumber = int(input("Enter number: "))
+        inputs = ManualInput(FunctionNumber)
+        results = GetOutputs(inputs)
+
+        for name, value in results.items():
+            if value is not None:
+                print(name, "=>", value)
+
+    elif FunctionToPerform == "FromFile":
+        print(FROM_FILE_MENU_TEXT)
+        Elaborate = input("Would you like to see the acceptable input names for different variables?")
+        if Elaborate.lower() == "yes":
+            print(ACCEPTABLE_INPUT_NAMES)
+        FileName = input("Enter file name: ")
+        inputs = ReadInputs(FileName)
+
+        results = GetOutputs(inputs)
+
+        for name, value in results.items():
+            if value is not None:
+                print(name, "=>", value)
+
+def ManualInput(FunctionNumber):
+
+    inputs = {}
+
+    if FunctionNumber == 1:
+        inputs["AssetCost"] = float(input("Enter Asset Cost: "))
+        inputs["SalvageValue"] = float(input("Enter Salvage Value: "))
+        inputs["UsefulLife"] = float(input("Enter Useful Life: "))
+    elif FunctionNumber == 2:
+        inputs["AssetCost"] = float(input("Enter Asset Cost: "))
+        inputs["SalvageValue"] = float(input("Enter Salvage Value: "))
+        inputs["AccumulatedDepreciation"] = float(input("Enter Accumulated Depreciation: "))
+        inputs["UsefulLife"] = float(input("Enter Useful Life: "))
+    elif FunctionNumber == 3:
+        inputs["AssetCost"] = float(input("Enter Asset Cost: "))
+        inputs["SalvageValue"] = float(input("Enter Salvage Value: "))
+        inputs["TotalEstimatedProduction"] = float(input("Enter Total Estimated Production: "))
+        inputs["ActualProduction"] = float(input("Enter Actual Production: "))
+    elif FunctionNumber == 4 or FunctionNumber == 5 or FunctionNumber == 6:
+        inputs["PurchaseQuantity1"] = float(input("Enter Purchase Quantity 1: "))
+        inputs["PurchaseQuantity2"] = float(input("Enter Purchase Quantity 2: "))
+        inputs["UnitCost1"] = float(input("Enter Unit Cost 1: "))
+        inputs["UnitCost2"] = float(input("Enter Unit Cost 2: "))
+        inputs["UnitsSold"] = float(input("Enter Units Sold: "))
+    elif FunctionNumber == 7:
+        inputs["PrincipalAmount"] = float(input("Enter Principal Amount: "))
+        inputs["InterestRate"] = float(input("Enter Interest Rate: "))
+        inputs["Time"] = float(input("Enter Time: "))
+    elif FunctionNumber == 8:
+        inputs["AccountsReceivable"] = float(input("Enter Accounts Receivable: "))
+        inputs["DefaultRateOfUncollectibility"] = float(input("Enter Default Rate of Uncollectibility: "))
+    elif FunctionNumber == 9:
+        inputs["InitialCarryingAmount"] = float(input("Enter Initial Carrying Amount of Bond: "))
+        inputs["EffectiveInterestRate"] = float(input("Enter Effective Interest Rate: "))
+        inputs["CouponRate"] = float(input("Enter Coupon Rate: "))
+        inputs["FaceValue"] = float(input("Enter Face Value: "))
+    else:
+        print("Invalid Function Number")
+
+    return inputs
+
+
+
+def ReadInputs(FileName):
+    values = {}
+    f = open(FileName, "r", encoding="utf-8")
+    lines = f.readlines()
+
+    for line in lines:
+        for term in TERMS_LIST:
+            if term in line:
+
+                value = line.split(":")[1].strip()
+
+                key = term.replace(" ", "")
+                values[key] = float(value)
+
+    return values
+
+def GetOutputs(inputs):
+    results = {}
+
+    results["StraightLine"] = StraightLineDepreciation(inputs)
+    results["DoubleDeclining"] = DoubleDecliningBalanceDepreciation(inputs)
+    results["FIFO"] = FIFOCOGS(inputs)
+    results["LIFO"] = LIFOCOGS(inputs)
+    results["Weighted"] = WeightedAverageCOGS(inputs)
+    results["AccrualInterest"] = AccrualInterest(inputs)
+    results["Allowance"] = AllowanceForDoubtfulAccounts(inputs)
+    results["EffectiveInterest"] = EffectiveInterestAmortization(inputs)
+
+    return results
+
+if __name__ == "__main__":
+    Main()
